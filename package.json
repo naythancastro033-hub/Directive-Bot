@@ -1,6 +1,7 @@
 {
   "name": "directive-bot",
   "version": "1.0.0",
+  "description": "Directive™ Enterprise Server Management & Security Infrastructure by Axiom Systems™",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
