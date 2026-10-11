@@ -1,29 +1,17 @@
 require('dotenv').config();
 const http = require('http');
-const { 
-    Client, 
-    GatewayIntentBits, 
-    PermissionsBitField, 
-    EmbedBuilder, 
-    ActionRowBuilder, 
-    ButtonBuilder, 
-    ButtonStyle 
-} = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 
-// ==========================================
-// RENDER WEBSERVICE HEALTH CHECK BINDING
-// ==========================================
+// Render health check server
 const port = process.env.PORT || 10000;
 http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Directive Engine Nominal // Axiom Systems™');
+    res.end('Directive Engine Nominal');
 }).listen(port, () => {
-    console.log(`[HTTP SERVER] Health check endpoint listening on port ${port}`);
+    console.log(`[HTTP] Health check running on port ${port}`);
 });
 
-// ==========================================
-// DISCORD CLIENT INITIALIZATION
-// ==========================================
+// Discord Client Setup
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -33,82 +21,34 @@ const client = new Client({
     ]
 });
 
-// In-memory configuration registry
-const serverConfigs = new Map();
-const joinTracker = new Map();
-
 client.once('ready', () => {
-    console.log(`[DIRECTIVE ENGINE ONLINE] Logged in as ${client.user.tag}`);
-    console.log(`[AXIOM SYSTEMS] Advanced Server Management & Threat Mitigation Active.`);
-    client.user.setActivity('over 50+ management modules | !directive help', { type: 3 });
+    console.log(`[DIRECTIVE ONLINE] Logged in as ${client.user.tag}`);
 });
 
-// ==========================================
-// ADVANCED SECURITY PROTOCOLS (Anti-Raid & Anti-Nuke)
-// ==========================================
-
-client.on('guildMemberAdd', async member => {
-    const guildId = member.guild.id;
-    const config = serverConfigs.get(guildId) || { antiRaid: true };
-
-    if (!config.antiRaid) return;
-
-    const now = Date.now();
-    if (!joinTracker.has(guildId)) joinTracker.set(guildId, []);
-    const timestamps = joinTracker.get(guildId);
-    
-    timestamps.push(now);
-    const recentJoins = timestamps.filter(time => now - time < 10000);
-    joinTracker.set(guildId, recentJoins);
-
-    if (recentJoins.length >= 5) {
-        try {
-            const systemChannel = member.guild.systemChannel;
-            if (systemChannel) {
-                const raidEmbed = new EmbedBuilder()
-                    .setTitle('🚨 SECURITY ALERT // Anti-Raid Triggered')
-                    .setColor(0xE74C3C)
-                    .setDescription('High-velocity member join spike detected. Directive™ has flagged potential automated raid activity.')
-                    .addFields(
-                        { name: 'Status', value: 'Elevated Threat Monitoring', inline: true },
-                        { name: 'Action Recommended', value: 'Verify server invite links and review audit logs.', inline: false }
-                    )
-                    .setTimestamp()
-                    .setFooter({ text: 'Directive™ Autonomous Defense // Axiom Systems™' });
-
-                systemChannel.send({ embeds: [raidEmbed] });
-            }
-        } catch (err) {
-            console.error('[ANTI-RAID ERROR] Failed to dispatch security notification:', err);
-        }
-    }
-});
-
-// ==========================================
-// COMMAND ROUTER & EMBED SUITE
-// ==========================================
-
+// Command Handler
 client.on('messageCreate', async message => {
     if (message.author.bot || !message.guild) return;
+    if (!message.content.startsWith('!directive ')) return;
 
-    const prefix = '!directive ';
-    if (!message.content.startsWith(prefix)) return;
-
-    const args = message.content.slice(prefix.length).trim().split(/ +/);
+    const args = message.content.slice(11).trim().split(/ +/);
     const command = args.shift().toLowerCase();
-    const guildId = message.guild.id;
 
-    if (!serverConfigs.has(guildId)) {
-        serverConfigs.set(guildId, {
-            prefix: '!',
-            antiRaid: true,
-            antiNuke: true,
-            autoMod: true,
-            logChannel: null,
-            verificationLevel: 'medium'
-        });
+    if (command === 'help' || command === 'commands') {
+        const helpEmbed = new EmbedBuilder()
+            .setTitle('📖 Directive™ // Command Directory')
+            .setColor(0x0F141C)
+            .setDescription('Available Commands:\n• `!directive help`\n• `!directive status`\n• `!directive setup`')
+            .setTimestamp();
+        return message.reply({ embeds: [helpEmbed] });
     }
-    const config = serverConfigs.get(guildId);
 
-    // --- 1. SETUP WIZARD EMBED ---
+    if (command === 'status') {
+        return message.reply('🟢 **Directive™ Engine Status:** Online and fully operational.');
+    }
+
     if (command === 'setup') {
+        return message.reply('🛡️ **Directive™ Setup:** Console loaded successfully.');
+    }
+});
+
+client.login(process.env.DISCORD_TOKEN);
