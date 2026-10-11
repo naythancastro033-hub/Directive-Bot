@@ -1,3 +1,18 @@
+const fs = require('fs');
+
+// Debug check to see if Render can see the public folder
+console.log('Current working directory:', process.cwd());
+console.log('__dirname:', __dirname);
+console.log('Files in root:', fs.readdirSync(__dirname));
+
+if (fs.existsSync(path.join(__dirname, 'public'))) {
+    console.log('Public folder contents:', fs.readdirSync(path.join(__dirname, 'public')));
+} else {
+    console.log('[Directive™ Error] Public folder NOT found by Node.js!');
+}
+
+app.use(express.static(path.join(__dirname, 'public')));
+
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
 const express = require('express');
 const path = require('path');
