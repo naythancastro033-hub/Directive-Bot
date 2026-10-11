@@ -28,10 +28,8 @@ const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildBans, // 👈 Updated to GuildBans for stable v14 resolution
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildAuditLogs
+        GatewayIntentBits.MessageContent
     ]
 });
 
@@ -139,80 +137,4 @@ client.on('messageCreate', async message => {
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder().setCustomId('toggle_antiraid').setLabel('Toggle Anti-Raid').setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setCustomId('toggle_antinuke').setLabel('Toggle Anti-Nuke').setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId('audit_perms').setLabel('Run Permission Audit').setStyle(ButtonStyle.Secondary)
-        );
-
-        return message.reply({ embeds: [setupEmbed], components: [row] });
-    }
-
-    // --- 2. PERMISSION AUDIT EMBED ---
-    if (command === 'fixperms' || command === 'auditperms') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return;
-
-        const botMember = message.guild.members.cache.get(client.user.id);
-        const requiredPerms = [
-            PermissionsBitField.Flags.ManageRoles,
-            PermissionsBitField.Flags.KickMembers,
-            PermissionsBitField.Flags.BanMembers,
-            PermissionsBitField.Flags.ViewAuditLog,
-            PermissionsBitField.Flags.ManageChannels
-        ];
-
-        const missing = requiredPerms.filter(perm => !botMember.permissions.has(perm));
-
-        const auditEmbed = new EmbedBuilder()
-            .setTitle('🔍 Directive™ // Permission Diagnostic')
-            .setTimestamp()
-            .setFooter({ text: 'Axiom Systems™ Security Framework' });
-
-        if (missing.length > 0) {
-            auditEmbed.setColor(0xF1C40F)
-                .setDescription(`⚠️ **Attention Required:** Directive™ is missing key privileges required for full functionality.`)
-                .addFields({ name: 'Missing Permissions', value: `\`${missing.join(', ')}\``, inline: false });
-        } else {
-            auditEmbed.setColor(0x2ECC71)
-                .setDescription(`✅ **System Healthy:** All required administrative management privileges are verified and assigned.`);
-        }
-
-        return message.reply({ embeds: [auditEmbed] });
-    }
-
-    // --- 3. COMMAND DIRECTORY (50+ MODULES) EMBED ---
-    if (command === 'help' || command === 'commands') {
-        const helpEmbed = new EmbedBuilder()
-            .setTitle('📖 Directive™ // Master Command Directory')
-            .setColor(0x0F141C)
-            .setDescription('Comprehensive listing of engineered server management modules under Axiom Systems™.')
-            .addFields(
-                { name: '🛡️ Security & Defense (1–12)', value: '`antiraid`, `antinuke`, `lockdown`, `unlock`, `lock`, `slowmode`, `jail`, `unjail`, `verify`, `raidmode`, `blacklist`, `whitelist`', inline: false },
-                { name: '⚙️ Configuration & Setup (13–25)', value: '`setup`, `fixperms`, `toggle`, `setprefix`, `setlogs`, `setwelcome`, `autorole`, `embedbuilder`, `ticketsetup`, `reactionrole`, `suggestions`, `logging`, `automod`', inline: false },
-                { name: '🔨 Moderation & Oversight (26–38)', value: '`ban`, `kick`, `mute`, `unmute`, `warn`, `warnings`, `clear`, `purge`, `tempmute`, `softban`, `note`, `inspect`, `history`', inline: false },
-                { name: '📊 Analytics & Utility (39–50)', value: '`serverinfo`, `userinfo`, `botstats`, `ping`, `uptime`, `poll`, `announcement`, `reminder`, `embed`, `avatar`, `banner`, `status`', inline: false }
-            )
-            .setTimestamp()
-            .setFooter({ text: 'Syntax: !directive [command] // Powered by Axiom Systems™' });
-
-        return message.reply({ embeds: [helpEmbed] });
-    }
-
-    // --- 4. SYSTEM STATUS EMBED ---
-    if (command === 'status') {
-        const statusEmbed = new EmbedBuilder()
-            .setTitle('📊 Directive™ // Enterprise Telemetry')
-            .setColor(0x0F141C)
-            .addFields(
-                { name: 'Parent Organization', value: 'Axiom Systems™', inline: true },
-                { name: 'Operational State', value: '🟢 `Optimal`', inline: true },
-                { name: 'Active Modules', value: '50 Suites Loaded', inline: true },
-                { name: 'Anti-Raid', value: config.antiRaid ? '`ONLINE`' : '`OFFLINE`', inline: true },
-                { name: 'Anti-Nuke', value: config.antiNuke ? '`ONLINE`' : '`OFFLINE`', inline: true },
-                { name: 'Gateway Latency', value: `${client.ws.ping}ms`, inline: true }
-            )
-            .setTimestamp()
-            .setFooter({ text: 'Directive™ System Diagnostics' });
-
-        return message.reply({ embeds: [statusEmbed] });
-    }
-});
-
-client.login(process.env.DISCORD_TOKEN);
+            new ButtonBuilder().setCustomId('audit_perms').setLabel
