@@ -1,5 +1,0 @@
-Directive-Bot/
-├── index.js
-├── package.json
-└── public/
-    └── index.html  <-- Ensure this file is present
