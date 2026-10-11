@@ -1,3 +1,6 @@
+git add index.js
+git commit -m "Update index.js with health check port binding"
+git push origin main
 require('dotenv').config();
 const http = require('http');
 const { 
