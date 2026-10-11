@@ -1,14 +1,16 @@
 {
   "name": "directive-bot",
   "version": "1.0.0",
-  "description": "Directive™ Enterprise Server Management & Security Infrastructure by Axiom Systems™",
+  "description": "Directive™ Bot & Dashboard by Axiom Systems™",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node --trace-deprecation index.js"
   },
   "dependencies": {
     "discord.js": "^14.14.1",
-    "dotenv": "^16.4.5",
     "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
