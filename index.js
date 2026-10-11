@@ -17,9 +17,14 @@ if (fs.existsSync(path.join(__dirname, 'public'))) {
     console.log('[Directive™ Error] Public folder NOT found by Node.js!');
 }
 
-// Initialize Discord Client FIRST so endpoints can access it safely
+// Initialize Discord Client with all required privileged intents
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMembers
+    ]
 });
 
 // Serve static dashboard files from the public directory
