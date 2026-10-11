@@ -134,7 +134,45 @@ client.on('messageCreate', async message => {
             .setTimestamp()
             .setFooter({ text: 'Directive™ Server Management // Axiom Systems™' });
 
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId('toggle_antiraid').setLabel('Toggle Anti-Raid').setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId('toggle_antinuke').setLabel('Toggle Anti-Nuke').setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId('audit_perms').setLabel
+        const row = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('toggle_antiraid')
+                    .setLabel('Toggle Anti-Raid')
+                    .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
+                    .setCustomId('toggle_antinuke')
+                    .setLabel('Toggle Anti-Nuke')
+                    .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
+                    .setCustomId('audit_perms')
+                    .setLabel('Run Permission Audit')
+                    .setStyle(ButtonStyle.Secondary)
+            );
+
+        return message.reply({ embeds: [setupEmbed], components: [row] });
+    }
+
+    // --- 2. PERMISSION AUDIT EMBED ---
+    if (command === 'fixperms' || command === 'auditperms') {
+        if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return;
+
+        const botMember = message.guild.members.cache.get(client.user.id);
+        const requiredPerms = [
+            PermissionsBitField.Flags.ManageRoles,
+            PermissionsBitField.Flags.KickMembers,
+            PermissionsBitField.Flags.BanMembers,
+            PermissionsBitField.Flags.ViewAuditLog,
+            PermissionsBitField.Flags.ManageChannels
+        ];
+
+        const missing = requiredPerms.filter(perm => !botMember.permissions.has(perm));
+
+        const auditEmbed = new EmbedBuilder()
+            .setTitle('🔍 Directive™ // Permission Diagnostic')
+            .setTimestamp()
+            .setFooter({ text: 'Axiom Systems™ Security Framework' });
+
+        if (missing.length > 0) {
+            auditEmbed.setColor(0xF1C40F)
+                .setDescription(`⚠️ **Attention Required:** Directive™ is missing key privileges required for full functionality.`)
