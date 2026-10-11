@@ -1,3 +1,1 @@
-git add index.js
-git commit -m "Update index.js with clean JavaScript"
-git push origin main
+
