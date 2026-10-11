@@ -1,16 +1,18 @@
 {
-  "name": "directive-bot",
-  "version": "1.0.0",
-  "description": "Directive™ Bot & Dashboard by Axiom Systems™",
-  "main": "index.js",
-  "scripts": {
-    "start": "node --trace-deprecation index.js"
-  },
-  "dependencies": {
-    "discord.js": "^14.14.1",
-    "express": "^4.19.2"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+"name": "directive-bot",
+"version": "1.0.0",
+"description": "Enterprise-grade Discord server management and security framework",
+"main": "index.js",
+"scripts": {
+"start": "node --trace-deprecation index.js"
+},
+"dependencies": {
+"cors": "^2.8.5",
+"discord.js": "^14.14.1",
+"express": "^4.19.2"
+},
+"engines": {
+"node": ">=18.0.0"
+},
+"private": true
 }
