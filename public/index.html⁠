@@ -75,9 +75,4 @@
         </div>
 
         <!-- Telemetry Card Widget -->
-        <div id="telemetry" class="w-full lg:w-96 bg-carddark border border-zinc-800/80 p-6 rounded-2xl shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-6 opacity-10">
-                <i data-lucide="cpu" class="w-24 h-24 text-purple-400"></i>
-            </div>
-            <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4 flex items-center space-x-2">
-                <i data-lucide="activity" class="w-4 h-4 text-purple-
+        <div id="telemetry" class="w-full lg:w-96 bg-carddark border border-zinc-800/
