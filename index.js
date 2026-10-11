@@ -28,7 +28,7 @@ const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildModerates,
+        GatewayIntentBits.GuildBans, // 👈 Updated to GuildBans for stable v14 resolution
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildAuditLogs
