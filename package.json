@@ -1,3 +1,13 @@
-"scripts": {
-  "start": "node src/index.js"
+{
+  "name": "directive-bot",
+  "version": "1.0.0",
+  "description": "Enterprise-grade Discord server management bot under Axiom Systems",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.0",
+    "dotenv": "^16.4.0"
+  }
 }
