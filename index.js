@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ==========================================
-// 1. EXPANDED DISCORD SLASH COMMANDS
+// 1. EXPANDED DISCORD SLASH COMMANDS (7 Total)
 // ==========================================
 
 const commands = [
@@ -191,6 +191,6 @@ app.listen(PORT, async () => {
       console.error('[Directive™ Error] Discord login failed:', err.message);
     });
   } else {
-    console.warn('[Directive™ Warning] DISCORD_BOT_TOKEN or DISCORD_CLIENT_ID missing in secrets.');
+    console.warn('[Directive™ Warning] DISCORD_BOT_TOKEN or CLIENT_ID missing in environment secrets.');
   }
 });
