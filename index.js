@@ -7,7 +7,7 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Allowed origins including your updated Replit dashboard URL
+// Configured allowed origins for cross-origin dashboard connections
 const allowedOrigins = [
     'https://directive-discord-dashboard--whiteknollinter.replit.app',
     'https://directive-dashboard-access-control--bavariankoolmot.replit.app'
@@ -16,26 +16,16 @@ const allowedOrigins = [
 app.use(express.json());
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests) or allowed origins
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            callback(null, true); // Fallback to allow connection
+            callback(null, true); // Permissive fallback to prevent API blocks
         }
     },
     methods: ['GET', 'POST']
 }));
 
-// Directory verification
-console.log('Current working directory:', process.cwd());
-console.log('__dirname:', __dirname);
-if (fs.existsSync(path.join(__dirname, 'public'))) {
-    console.log('Public folder contents:', fs.readdirSync(path.join(__dirname, 'public')));
-} else {
-    console.log('[Directive™ Error] Public folder NOT found by Node.js!');
-}
-
-// Initialize Discord Client with required privileged intents
+// Initialize Discord Client with required privileged gateway intents
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -46,10 +36,10 @@ const client = new Client({
     ]
 });
 
-// Serve static dashboard files from public directory
+// Serve static dashboard assets from public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Telemetry endpoint for Replit dashboard
+// API Endpoint: Live Telemetry
 app.get('/api/telemetry', (req, res) => {
     try {
         res.json({
@@ -62,7 +52,7 @@ app.get('/api/telemetry', (req, res) => {
     }
 });
 
-// Admin verification endpoint
+// API Endpoint: Admin Access Control Verification
 app.post('/api/auth/verify', (req, res) => {
     const { key } = req.body;
     if (key && key === process.env.ADMIN_DEVELOPER_KEY) {
@@ -71,52 +61,52 @@ app.post('/api/auth/verify', (req, res) => {
     return res.status(401).json({ success: false, message: 'Invalid Admin Developer Key.' });
 });
 
-// Serve index.html for static frontend requests
+// Fallback Route for Static HTML
 app.get('*', (req, res) => {
     const indexPath = path.join(__dirname, 'public', 'index.html');
     if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
     } else {
-        res.status(404).send('Directive™ Dashboard: index.html not found in public folder.');
+        res.status(404).send('Directive™ System: Frontend assets not found.');
     }
 });
 
-// Slash Command Definitions
+// Slash Commands Definition
 const commands = [
-    new SlashCommandBuilder().setName('ping').setDescription('Check bot ping'),
-    new SlashCommandBuilder().setName('serverinfo').setDescription('Display server details'),
-    new SlashCommandBuilder().setName('verify').setDescription('Initiate verification'),
-    new SlashCommandBuilder().setName('lockdown').setDescription('Restrict channel access'),
-    new SlashCommandBuilder().setName('audit').setDescription('Run security diagnostics'),
-    new SlashCommandBuilder().setName('health').setDescription('Check bot health metrics'),
-    new SlashCommandBuilder().setName('purge').setDescription('Bulk delete messages')
-        .addIntegerOption(opt => opt.setName('amount').setDescription('Number of messages').setRequired(true))
+    new SlashCommandBuilder().setName('ping').setDescription('Check bot network latency'),
+    new SlashCommandBuilder().setName('serverinfo').setDescription('Display current server details'),
+    new SlashCommandBuilder().setName('verify').setDescription('Initiate user verification process'),
+    new SlashCommandBuilder().setName('lockdown').setDescription('Restrict access to channels'),
+    new SlashCommandBuilder().setName('audit').setDescription('Run system security diagnostics'),
+    new SlashCommandBuilder().setName('health').setDescription('Display service health metrics'),
+    new SlashCommandBuilder().setName('purge').setDescription('Bulk delete messages from channel')
+        .addIntegerOption(opt => opt.setName('amount').setDescription('Number of messages to clear').setRequired(true))
 ].map(cmd => cmd.toJSON());
 
-// Register Slash Commands
+// Register Slash Commands via Discord REST API
 async function registerCommands() {
     try {
         if (!process.env.DISCORD_BOT_TOKEN || !process.env.DISCORD_CLIENT_ID) {
-            console.error('[Directive™ Error] DISCORD_BOT_TOKEN or DISCORD_CLIENT_ID missing.');
+            console.error('[Directive™ Error] DISCORD_BOT_TOKEN or DISCORD_CLIENT_ID is missing.');
             return;
         }
         const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
-        console.log('[Directive™ Core] Registering slash commands...');
+        console.log('[Directive™ Core] Synchronizing slash commands...');
         await rest.put(
             Routes.applicationCommands(process.env.DISCORD_CLIENT_ID),
             { body: commands }
         );
-        console.log('[Directive™ Core] Successfully registered slash commands!');
+        console.log('[Directive™ Core] Successfully registered all slash commands!');
     } catch (error) {
         console.error('[Directive™ Error] Command registration failed:', error.message);
     }
 }
 
-// Client Ready Handler
+// ClientReady Event Listener (modern discord.js v14 standard)
 client.once(Events.ClientReady, c => {
-    console.log(`[Directive™ Core] Logged in as ${c.user.tag}`);
+    console.log(`[Directive™ Core] Authenticated and logged in as ${c.user.tag}`);
     
-    // Set presence status
+    // Explicitly update Discord presence to Online
     c.user.setPresence({
         status: 'online',
         activities: [{ name: 'Directive™ Security | /help', type: ActivityType.Watching }]
@@ -127,14 +117,14 @@ client.once(Events.ClientReady, c => {
 
 // Start Express Server
 app.listen(PORT, () => {
-    console.log(`[Axiom Systems™] Web server listening on port ${PORT}`);
+    console.log(`[Axiom Systems™] Web server online on port ${PORT}`);
 });
 
-// Connect Bot to Discord
+// Authenticate and Login to Discord Gateway
 if (process.env.DISCORD_BOT_TOKEN) {
     client.login(process.env.DISCORD_BOT_TOKEN).catch(err => {
-        console.error('[Directive™ Error] Discord login failed:', err.message);
+        console.error('[Directive™ Error] Gateway authentication failed:', err.message);
     });
 } else {
-    console.error('[Directive™ Error] DISCORD_BOT_TOKEN environment variable is missing.');
+    console.error('[Directive™ Error] DISCORD_BOT_TOKEN environment variable missing.');
 }
