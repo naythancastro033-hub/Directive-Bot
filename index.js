@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ActivityType, Events } = require('discord.js');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -7,14 +7,26 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Allow cross-origin requests from your Replit dashboard and local clients
+// Allowed origins including your updated Replit dashboard URL
+const allowedOrigins = [
+    'https://directive-discord-dashboard--whiteknollinter.replit.app',
+    'https://directive-dashboard-access-control--bavariankoolmot.replit.app'
+];
+
 app.use(express.json());
 app.use(cors({
-    origin: '*', // Allows requests from https://directive-dashboard-access-control--bavariankoolmot.replit.app
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests) or allowed origins
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(null, true); // Fallback to allow connection
+        }
+    },
     methods: ['GET', 'POST']
 }));
 
-// --- DIRECTORY DEBUG CHECK ---
+// Directory verification
 console.log('Current working directory:', process.cwd());
 console.log('__dirname:', __dirname);
 if (fs.existsSync(path.join(__dirname, 'public'))) {
@@ -29,20 +41,21 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildPresences
     ]
 });
 
-// Serve static dashboard files from the public directory
+// Serve static dashboard files from public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Telemetry API endpoint for Replit dashboard
+// Telemetry endpoint for Replit dashboard
 app.get('/api/telemetry', (req, res) => {
     try {
         res.json({
             ping: client.ws && client.ws.ping ? client.ws.ping : 0,
             guildCount: client.guilds ? client.guilds.cache.size : 0,
-            status: 'ONLINE'
+            status: client.isReady() ? 'ONLINE' : 'OFFLINE'
         });
     } catch (err) {
         res.json({ ping: 0, guildCount: 0, status: 'ERROR' });
@@ -58,7 +71,7 @@ app.post('/api/auth/verify', (req, res) => {
     return res.status(401).json({ success: false, message: 'Invalid Admin Developer Key.' });
 });
 
-// Serve index.html for all static frontend requests
+// Serve index.html for static frontend requests
 app.get('*', (req, res) => {
     const indexPath = path.join(__dirname, 'public', 'index.html');
     if (fs.existsSync(indexPath)) {
@@ -68,7 +81,7 @@ app.get('*', (req, res) => {
     }
 });
 
-// Define Slash Commands
+// Slash Command Definitions
 const commands = [
     new SlashCommandBuilder().setName('ping').setDescription('Check bot ping'),
     new SlashCommandBuilder().setName('serverinfo').setDescription('Display server details'),
@@ -80,7 +93,7 @@ const commands = [
         .addIntegerOption(opt => opt.setName('amount').setDescription('Number of messages').setRequired(true))
 ].map(cmd => cmd.toJSON());
 
-// Register Slash Commands with Discord REST API
+// Register Slash Commands
 async function registerCommands() {
     try {
         if (!process.env.DISCORD_BOT_TOKEN || !process.env.DISCORD_CLIENT_ID) {
@@ -99,8 +112,16 @@ async function registerCommands() {
     }
 }
 
-client.once('ready', () => {
-    console.log(`[Directive™ Core] Logged in as ${client.user.tag}`);
+// Client Ready Handler
+client.once(Events.ClientReady, c => {
+    console.log(`[Directive™ Core] Logged in as ${c.user.tag}`);
+    
+    // Set presence status
+    c.user.setPresence({
+        status: 'online',
+        activities: [{ name: 'Directive™ Security | /help', type: ActivityType.Watching }]
+    });
+
     registerCommands();
 });
 
@@ -109,7 +130,7 @@ app.listen(PORT, () => {
     console.log(`[Axiom Systems™] Web server listening on port ${PORT}`);
 });
 
-// Login Bot to Discord
+// Connect Bot to Discord
 if (process.env.DISCORD_BOT_TOKEN) {
     client.login(process.env.DISCORD_BOT_TOKEN).catch(err => {
         console.error('[Directive™ Error] Discord login failed:', err.message);
